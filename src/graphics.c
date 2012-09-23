@@ -38,29 +38,26 @@ int piguCreateWindow(int width, int height, int red, int green,int blue, int alp
 
    EGLConfig config;
 
-   // get an EGL display connection
    state.display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-   assert(state.display!=EGL_NO_DISPLAY);
 
+   if(state.display==EGL_NO_DISPLAY)
+      return -1;
 
-   // initialize the EGL display connection
    result = eglInitialize(state.display, NULL, NULL);
-   assert(EGL_FALSE != result);
+   if(EGL_FALSE == result)
+      return -1;
 
-
-   // get an appropriate EGL frame buffer configuration
    result = eglChooseConfig(state.display, attribute_list, &config, 1, &num_config);
-   assert(EGL_FALSE != result);
+   if(EGL_FALSE == result)
+      return -1;
 
-
-   // get an appropriate EGL frame buffer configuration
    result = eglBindAPI(EGL_OPENGL_ES_API);
-   assert(EGL_FALSE != result);
+   if(EGL_FALSE == result)
+      return -1;
 
-
-   // create an EGL rendering context
    state.context = eglCreateContext(state.display, config, EGL_NO_CONTEXT, context_attributes);
-   assert(state.context!=EGL_NO_CONTEXT);
+   if(state.context==EGL_NO_CONTEXT)
+      return -1;
 
 
    // create an EGL window surface
@@ -94,7 +91,8 @@ int piguCreateWindow(int width, int height, int red, int green,int blue, int alp
 
    // connect the context to the surface
    result = eglMakeCurrent(state.display, state.surface, state.surface, state.context);
-   assert(EGL_FALSE != result);
+   if(EGL_FALSE != result)
+      return -1;
 
    return 0;
 }    
