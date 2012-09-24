@@ -1,0 +1,6 @@
+PIGU (PI Game Utility Library)
+==============================
+
+PIGU is a utility library handling GLES "window" creation and input handling
+(keyboards, mice and game controllers) for the Raspberry PI. Descriptions of
+the available functions can be found in the header include/pigu.h.
