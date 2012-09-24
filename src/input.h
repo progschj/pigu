@@ -1,18 +1,11 @@
 #ifndef PIGU_INPUT_H
 #define PIGU_INPUT_H
 
+#include "pigu.h"
+
 #include <inttypes.h>
 #include <fcntl.h>
 #include <linux/input.h>
-
-typedef enum 
-{
-   PIGU_UNKNOWN,
-   PIGU_KEYBOARD, 
-   PIGU_MOUSE, 
-   PIGU_GAMEPAD, 
-   PIGU_JOYSTICK
-} PIGU_device_type_t;
 
 typedef struct {
    uint8_t count;

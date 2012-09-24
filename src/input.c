@@ -160,7 +160,6 @@ int PIGU_poll_events_device(PIGU_device_info_t *info)
 	 switch(info->type)
 	 {
 	 case PIGU_KEYBOARD:
-	    //info->keyboard.key_state[event.code] = event.value;
 	    PIGU_set_bit(info->keyboard.key_state, event.code, event.value);
 	    break;
 
@@ -208,8 +207,12 @@ int piguPollEvents()
 {
    int event_count = 0;
    int i;
-   event_count += PIGU_poll_events_device(state.keyboard);
-   event_count += PIGU_poll_events_device(state.mouse);
+   for(i = 0;i<state.keyboard_count;++i)
+	  event_count += PIGU_poll_events_device(state.keyboard+i);
+
+   for(i = 0;i<state.mouse_count;++i)
+	  event_count += PIGU_poll_events_device(state.mouse+i);
+
    for(i = 0;i<state.controller_count;++i)
 	  event_count += PIGU_poll_events_device(state.controller+i);
 
@@ -218,7 +221,38 @@ int piguPollEvents()
 
 int piguIsKeyDown(int keycode)
 {
-   return keycode < KEY_MAX ? PIGU_get_bit(state.keyboard[0].keyboard.key_state, keycode) : 0;
+   if(keycode >= KEY_MAX)
+      return 0;
+   int i;
+   for(i = 0;i<state.keyboard_count;++i)
+      if(PIGU_get_bit(state.keyboard[i].keyboard.key_state, keycode))
+	 return 1;
+
+   return 0;
+}
+
+int piguIsMouseButtonDown(int button)
+{
+   int i;
+   for(i = 0;i<state.mouse_count;++i)
+   {
+      if(button < state.mouse[i].mouse.buttons.count
+	 && state.mouse[0].mouse.buttons.state[button])
+	 return 1;
+   }
+   return 0;   
+}
+
+int piguGetControllerCount()
+{
+   return state.controller_count;
+}
+
+PIGU_device_type_t piguGetControllerType(int controller)
+{
+   if(controller >= state.controller_count)
+      return PIGU_UNKNOWN;
+   return state.controller[controller].type;
 }
  
 int piguIsControllerButtonDown(int controller, int button)
@@ -233,13 +267,25 @@ int piguIsControllerButtonDown(int controller, int button)
 
 void piguGetMousePosition(int *x, int *y)
 {
-   *x = state.mouse[0].mouse.position[0];
-   *y = state.mouse[0].mouse.position[1];
+   x = 0; y= 0;
+   int i;
+   for(i = 0;i<state.mouse_count;++i)
+   {
+      *x += state.mouse[0].mouse.position[0];
+      *y += state.mouse[0].mouse.position[1];
+   }
 }
 
 int piguGetMouseWheelPosition()
 {
-  return state.mouse[0].mouse.wheel;
+   int position = 0;
+   int i;
+   for(i = 0;i<state.mouse_count;++i)
+   {
+      position += state.mouse[i].mouse.wheel;
+   }
+
+   return position;
 }
 
 float piguGetAxis(int controller, int axis)
