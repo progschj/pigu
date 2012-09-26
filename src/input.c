@@ -111,6 +111,10 @@ int PIGU_detect_device(const char *device, PIGU_device_info_t *info)
 	 }
    }
 
+   // we simply assume that a device that reports gamepad events
+   // is actually a gamepad... a device that reports different types
+   // of events will simply detected according to the order of this
+   // if chain here.
    info->type = PIGU_UNKNOWN;
    if(gamepad_button_count > 0)
    {
@@ -136,6 +140,8 @@ int PIGU_detect_device(const char *device, PIGU_device_info_t *info)
    }
    else
    {
+      // no idea what it is so we ignore it
+      // touch screen devices probably end up here atm
       close(info->fd);
    }
 
@@ -223,7 +229,9 @@ int piguIsKeyDown(int keycode)
 {
    if(keycode >= KEY_MAX)
       return 0;
+
    int i;
+   // check if the key is down on any of the found keyboards
    for(i = 0;i<state.keyboard_count;++i)
       if(PIGU_get_bit(state.keyboard[i].keyboard.key_state, keycode))
 	 return 1;
@@ -234,6 +242,7 @@ int piguIsKeyDown(int keycode)
 int piguIsMouseButtonDown(int button)
 {
    int i;
+   // check if the button is down on any of the found mice
    for(i = 0;i<state.mouse_count;++i)
    {
       if(button < state.mouse[i].mouse.buttons.count
@@ -261,6 +270,9 @@ int piguIsControllerButtonDown(int controller, int button)
       return 0;
    if(button >= state.controller[controller].controller.buttons.count)
       return 0;
+
+   // "controller[controller].controller", uhm, yeah, sorry about that :D
+
    int idx = state.controller[controller].controller.buttons.map[button];
    return state.controller[controller].controller.buttons.state[idx];
 }
@@ -269,6 +281,7 @@ void piguGetMousePosition(int *x, int *y)
 {
    x = 0; y= 0;
    int i;
+   // sum the position of all mice
    for(i = 0;i<state.mouse_count;++i)
    {
       *x += state.mouse[0].mouse.position[0];
@@ -280,6 +293,7 @@ int piguGetMouseWheelPosition()
 {
    int position = 0;
    int i;
+   // sum all mouse wheel positions
    for(i = 0;i<state.mouse_count;++i)
    {
       position += state.mouse[i].mouse.wheel;
@@ -298,6 +312,8 @@ float piguGetAxis(int controller, int axis)
 
    int v = state.controller[controller].controller.axes.position[idx];
    
+   // axes are rescaled to the range -1:1. If the range is 0:max
+   // we end up with parameters in 0:1 (and min:0 will go horribly wrong)
    if(v >= 0) 
       return v/(float)state.controller[controller].controller.axes.max[idx];
    else

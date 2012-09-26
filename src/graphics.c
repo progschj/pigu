@@ -6,7 +6,8 @@ int piguGetScreenSize(int *width, int *height)
    int32_t success = 0;
    uint32_t screen_width = 0, screen_height = 0;
 
-   success = graphics_get_display_size(0 /* LCD */, &screen_width, &screen_height);
+   // this function is just a wrapper around this bcm api function
+   success = graphics_get_display_size(0, &screen_width, &screen_height);
 
    *width = screen_width;
    *height = screen_height;
@@ -16,6 +17,8 @@ int piguGetScreenSize(int *width, int *height)
 
 int piguCreateWindow(int width, int height, int red, int green,int blue, int alpha, int depth, int stencil, int samples)
 {
+   // this pretty much follows the example from the "sdk".
+   // See hello_triangle2/triangle.c for the original code
    EGLBoolean result;
    EGLint num_config;
 
@@ -46,6 +49,8 @@ int piguCreateWindow(int width, int height, int red, int green,int blue, int alp
    attribute_list[12] = EGL_SURFACE_TYPE;    
    attribute_list[13] = EGL_WINDOW_BIT;
 
+   // only set these if we actually want multisampling. It seems the moment
+   // a sample count is set it automatically ends up doing 4x MSAA
    if(samples>2)
    {
       attribute_list[14] = EGL_SAMPLES;
@@ -80,8 +85,6 @@ int piguCreateWindow(int width, int height, int red, int green,int blue, int alp
    if(state.context==EGL_NO_CONTEXT)
       return -1;
 
-
-   // create an EGL window surface
    dst_rect.x = 0;
    dst_rect.y = 0;
    dst_rect.width = state.screen_width;
@@ -102,14 +105,10 @@ int piguCreateWindow(int width, int height, int red, int green,int blue, int alp
    state.nativewindow.height = height;
    vc_dispmanx_update_submit_sync( dispman_update );
 
-
-
    state.surface = eglCreateWindowSurface( state.display, state.config, &state.nativewindow, NULL );
    if(state.surface == EGL_NO_SURFACE)
       return -1;
 
-
-   // connect the context to the surface
    result = eglMakeCurrent(state.display, state.surface, state.surface, state.context);
    if(EGL_FALSE == result)
       return -1;
@@ -146,7 +145,6 @@ int piguChangeResolution(int width, int height)
 
    eglDestroySurface(state.display, state.surface);
 
-   // create an EGL window surface
    dst_rect.x = 0;
    dst_rect.y = 0;
    dst_rect.width = state.screen_width;
@@ -168,14 +166,10 @@ int piguChangeResolution(int width, int height)
    state.nativewindow.height = height;
    vc_dispmanx_update_submit_sync( dispman_update );
 
-
-
    state.surface = eglCreateWindowSurface( state.display, state.config, &state.nativewindow, NULL );
    if(state.surface == EGL_NO_SURFACE)
       return -1;
 
-
-   // connect the context to the surface
    result = eglMakeCurrent(state.display, state.surface, state.surface, state.context);
    if(EGL_FALSE == result)
       return -1;
@@ -194,9 +188,7 @@ void piguCloseWindow()
    eglDestroySurface(state.display, state.surface);
 
    DISPMANX_UPDATE_HANDLE_T dispman_update = vc_dispmanx_update_start( 0 );
-
    vc_dispmanx_element_remove(dispman_update, state.dispman_element);
-
    vc_dispmanx_update_submit_sync( dispman_update );
 
    vc_dispmanx_display_close(state.dispman_display);

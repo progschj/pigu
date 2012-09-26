@@ -43,14 +43,16 @@ typedef struct {
    };
 } PIGU_device_info_t;
 
-
+// constructors for the structs
 void PIGU_init_axis_data(PIGU_axis_data_t *data);
-
 void PIGU_init_button_data(PIGU_button_data_t *data);
 
+// opends a evdev device such as "/dev/input/event0" and tries to guess
+// its type (keyboard, mouse, gamepad, joystick) and fills the info
+// struct accordingly
 int PIGU_detect_device(const char *device, PIGU_device_info_t *info);
 
+// updates the state of the device by reading all pending events
 int PIGU_poll_events_device(PIGU_device_info_t *info);
-
 
 #endif

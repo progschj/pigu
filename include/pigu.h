@@ -16,13 +16,14 @@ typedef enum
 
 /*
  * piguInit initializes the internal state and has to be called
- * before any of the other pigu functions
+ * before any of the other pigu functions. Calls to other
+ * pigu functions before piguInit have undefined behavior.
  */
 int piguInit();
 
 /*
  * piguTerminate should be called at the end of the program
- * to free all ressources
+ * to free all ressources.
  */
 void piguTerminate();
 
@@ -84,14 +85,26 @@ void piguGetMousePosition(int *x, int *y);
 int piguGetMouseWheelPosition();
 
 /*
+ * piguGetScreenSize returns the "physical" screen size as
+ * reported by the firmware api can be called before
+ * piguCreateWindow.
+ */
+int piguGetScreenSize(int *width, int *height);
+
+/*
  * piguCreateWindow creates a windows with a GLES2 context
  * all parameters have to be supplied
+ * red, gree, blue, alpha, depth and stencil are the
+ * minimal amount of bits for each component
+ * to get the native resolution of the screen call
+ * piguGetScreenSize first.
  */
-   int piguCreateWindow(int width, int height, int red, int green, int blue, int alpha, int depth, int stencil, int samples);
+int piguCreateWindow(int width, int height, int red, int green, int blue, int alpha, int depth, int stencil, int samples);
 
 /*
  * piguChangeResolution changes the resolution of the
- * GLES framebuffer. Does not update Viewport and Scissor!
+ * GLES framebuffer while preserving the context.
+ * Does not update Viewport and Scissor!
  */
 int piguChangeResolution(int width, int height);
 
@@ -108,17 +121,15 @@ void piguSwapBuffers();
 
 /*
  * piguSwapInterval set the swap interval (vsync)
+ * 1 = one frame per refresh
+ * 2 = one frame every second refresh
+ * ...
  */
 void piguSwapInterval(int interval);
 
 /*
- * piguGetScreenSize returns the "physical" screen size
- * can be called before piguCreateWindow.
- */
-int piguGetScreenSize(int *width, int *height);
-
-/*
- * piguGetTime returns the time in seconds.
+ * piguGetTime returns the time in seconds as measured from
+ * the first call to piguGetTime
  */
 double piguGetTime();
 
