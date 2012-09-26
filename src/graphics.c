@@ -14,7 +14,7 @@ int piguGetScreenSize(int *width, int *height)
 }
 
 
-int piguCreateWindow(int width, int height, int red, int green,int blue, int alpha, int depth, int stencil)
+int piguCreateWindow(int width, int height, int red, int green,int blue, int alpha, int depth, int stencil, int samples)
 {
    EGLBoolean result;
    EGLint num_config;
@@ -26,7 +26,11 @@ int piguCreateWindow(int width, int height, int red, int green,int blue, int alp
    if(0 > graphics_get_display_size(0, &state.screen_width, &state.screen_height))
       return -1;
 
-   EGLint attribute_list[15];
+   EGLint attribute_list[20];
+   int i;
+   for(i = 0;i<20;++i)
+      attribute_list[i] = EGL_NONE;
+
    attribute_list[ 0] = EGL_RED_SIZE;
    attribute_list[ 1] = red;
    attribute_list[ 2] = EGL_GREEN_SIZE;
@@ -41,7 +45,14 @@ int piguCreateWindow(int width, int height, int red, int green,int blue, int alp
    attribute_list[11] = stencil;
    attribute_list[12] = EGL_SURFACE_TYPE;    
    attribute_list[13] = EGL_WINDOW_BIT;
-   attribute_list[14] = EGL_NONE;
+
+   if(samples>2)
+   {
+      attribute_list[14] = EGL_SAMPLES;
+      attribute_list[15] = samples;
+      attribute_list[16] = EGL_SAMPLE_BUFFERS;
+      attribute_list[17] = 1;
+   }
    
    EGLint context_attributes[3]; 
    context_attributes[0] = EGL_CONTEXT_CLIENT_VERSION;

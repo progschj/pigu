@@ -87,7 +87,7 @@ int piguGetMouseWheelPosition();
  * piguCreateWindow creates a windows with a GLES2 context
  * all parameters have to be supplied
  */
-int piguCreateWindow(int width, int height, int red, int green, int blue, int alpha, int depth, int stencil);
+   int piguCreateWindow(int width, int height, int red, int green, int blue, int alpha, int depth, int stencil, int samples);
 
 /*
  * piguChangeResolution changes the resolution of the
@@ -107,7 +107,7 @@ void piguCloseWindow();
 void piguSwapBuffers();
 
 /*
- * piguSwapBuffers swaps the buffers ;)
+ * piguSwapInterval set the swap interval (vsync)
  */
 void piguSwapInterval(int interval);
 
