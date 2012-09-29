@@ -97,8 +97,13 @@ int piguCreateWindow(int width, int height, int red, int green,int blue, int alp
 
    state.dispman_display = vc_dispmanx_display_open( 0 /* LCD */);
    dispman_update = vc_dispmanx_update_start( 0 );
-         
-   state.dispman_element = vc_dispmanx_element_add ( dispman_update, state.dispman_display, 0/*layer*/, &dst_rect, 0/*src*/, &src_rect, DISPMANX_PROTECTION_NONE, 0 /*alpha*/, 0/*clamp*/, (DISPMANX_TRANSFORM_T)0/*transform*/);
+
+   VC_DISPMANX_ALPHA_T alpha_flags;
+   alpha_flags.flags = DISPMANX_FLAGS_ALPHA_FIXED_ALL_PIXELS;
+   alpha_flags.opacity = 255;
+   alpha_flags.mask = 0;
+
+   state.dispman_element = vc_dispmanx_element_add ( dispman_update, state.dispman_display, 0/*layer*/, &dst_rect, 0/*src*/, &src_rect, DISPMANX_PROTECTION_NONE, &alpha_flags /*alpha*/, 0/*clamp*/, (DISPMANX_TRANSFORM_T)0/*transform*/);
       
    state.nativewindow.element = state.dispman_element;
    state.nativewindow.width = width;
