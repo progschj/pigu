@@ -69,6 +69,8 @@ int PIGU_detect_device(const char *device, PIGU_device_info_t *info)
 	 if(PIGU_get_bit(events, j))
 	 {
 	    mouse_button_count++;
+	    if(j-BTN_MOUSE>=16)
+	       continue;
 	    buttons.map[buttons.count] = j-BTN_MOUSE;
 	    buttons.count++;
 	 }
@@ -77,6 +79,8 @@ int PIGU_detect_device(const char *device, PIGU_device_info_t *info)
 	 if(PIGU_get_bit(events, j))
 	 {
 	    joystick_button_count++;
+	    if(j-BTN_JOYSTICK>=16)
+	       continue;
 	    buttons.map[buttons.count] = j-BTN_JOYSTICK;
 	    buttons.count++;
 	 }
@@ -85,6 +89,8 @@ int PIGU_detect_device(const char *device, PIGU_device_info_t *info)
 	 if(PIGU_get_bit(events, j))
 	 {
 	    gamepad_button_count++;
+	    if(j-BTN_GAMEPAD>=16)
+	       continue;
 	    buttons.map[buttons.count] = j-BTN_GAMEPAD;
 	    buttons.count++;
 	 }
@@ -160,7 +166,7 @@ int PIGU_poll_events_device(PIGU_device_info_t *info)
    readsize = read(info->fd, &event, sizeof(event));
    while(readsize >= 0)
    {
-      int button_idx;
+      unsigned button_idx;
       if(event.type == EV_KEY)
       {
 	 switch(info->type)
@@ -246,7 +252,7 @@ int piguIsMouseButtonDown(int button)
    for(i = 0;i<state.mouse_count;++i)
    {
       if(button < state.mouse[i].mouse.buttons.count
-	 && state.mouse[0].mouse.buttons.state[button])
+	 && state.mouse[i].mouse.buttons.state[button])
 	 return 1;
    }
    return 0;   
@@ -279,14 +285,16 @@ int piguIsControllerButtonDown(int controller, int button)
 
 void piguGetMousePosition(int *x, int *y)
 {
-   x = 0; y= 0;
+   *x = 0; *y= 0;
+   
    int i;
    // sum the position of all mice
    for(i = 0;i<state.mouse_count;++i)
    {
-      *x += state.mouse[0].mouse.position[0];
-      *y += state.mouse[0].mouse.position[1];
+      *x += state.mouse[i].mouse.position[0];
+      *y += state.mouse[i].mouse.position[1];
    }
+
 }
 
 int piguGetMouseWheelPosition()

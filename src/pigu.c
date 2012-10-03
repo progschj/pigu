@@ -33,8 +33,6 @@ int piguInit()
 	    break;
 	 state.keyboard[state.keyboard_count] = info;
 	 state.keyboard_count++;
-
-
 	 break;
 
       case PIGU_MOUSE:

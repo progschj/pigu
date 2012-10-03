@@ -1,4 +1,3 @@
-
 CFLAGS+=-O3 -march=armv6 -mfpu=vfp -mfloat-abi=hard -Wall -Wextra
 LDFLAGS+=-lGLESv2 -lEGL -lbcm_host -lvcos
 INCLUDES+=-Iinclude
