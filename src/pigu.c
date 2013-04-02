@@ -71,5 +71,5 @@ void piguTerminate()
       if(state.controller[i].fd >= 0)
 	 close(state.controller[i].fd);
 
-   bcm_host_init();
+   bcm_host_deinit();
 }
